@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useRef, ChangeEvent } from 'react';
-import html2pdf from 'html2pdf.js';
+
 
 interface Experience {
   id: number;
@@ -111,7 +111,7 @@ export default function ResumeBuilder() {
     }
   }, [data, isClient]);
 
-  const downloadPDF = () => {
+  const downloadPDF = async () => {
     const element = resumeRef.current;
     if (!element) return;
     const opt = {
@@ -121,6 +121,9 @@ export default function ResumeBuilder() {
       html2canvas: { scale: 2, useCORS: true },
       jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
     };
+
+    // Dynamically import html2pdf.js to avoid "self is not defined" error during SSR
+    const html2pdf = (await import('html2pdf.js')).default;
     html2pdf().set(opt).from(element).save();
   };
 
