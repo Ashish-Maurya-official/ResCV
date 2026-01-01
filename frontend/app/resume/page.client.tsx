@@ -1,6 +1,8 @@
 'use client';
 
 import { useState, useEffect, useRef, ChangeEvent } from 'react';
+import axios from 'axios';
+import { useRouter } from 'next/navigation';
 
 
 interface Experience {
@@ -28,6 +30,8 @@ interface Education {
 }
 
 interface ResumeData {
+  id?: number;
+  userId?: number;
   fullName: string;
   address: string;
   phone: string;
@@ -94,19 +98,69 @@ const initialData: ResumeData = {
 export default function ResumeBuilder() {
   const [data, setData] = useState<ResumeData>(initialData);
   const [isClient, setIsClient] = useState(false);
+  const [userId, setUserId] = useState<string | null>(null);
+  const [username, setUsername] = useState<string | null>(null);
   const resumeRef = useRef<HTMLDivElement>(null);
+  const router = useRouter();
 
   useEffect(() => {
     setIsClient(true);
-    const savedData = localStorage.getItem('resumeData');
-    if (savedData) {
-      try {
-        setData(JSON.parse(savedData));
-      } catch (e) {
-        console.error('Failed to parse resume data', e);
+    const storedUserId = localStorage.getItem('userId');
+    const storedUsername = localStorage.getItem('username');
+    setUserId(storedUserId);
+    setUsername(storedUsername);
+
+    if (storedUserId) {
+      // Fetch from backend
+      axios.get(`http://localhost:8080/api/resume/user/${storedUserId}`)
+        .then(res => {
+          if (res.data) {
+            console.log("Fetched resume:", res.data);
+            setData(res.data);
+          }
+        })
+        .catch(err => {
+          console.log("No existing resume found on backend, using local/default.");
+          // Fallback to local storage if backend has nothing
+          const savedData = localStorage.getItem('resumeData');
+          if (savedData) {
+            try {
+              setData(JSON.parse(savedData));
+            } catch (e) {
+              console.error('Failed to parse resume data', e);
+            }
+          }
+        });
+    } else {
+      // Not logged in, use local storage
+      const savedData = localStorage.getItem('resumeData');
+      if (savedData) {
+        try {
+          setData(JSON.parse(savedData));
+        } catch (e) {
+          console.error('Failed to parse resume data', e);
+        }
       }
     }
   }, []);
+
+  const saveToBackend = async () => {
+    if (!userId) {
+      alert('Please login to save to the cloud.');
+      router.push('/auth');
+      return;
+    }
+
+    try {
+      const payload = { ...data, userId: parseInt(userId) };
+      const res = await axios.post('http://localhost:8080/api/resume', payload);
+      setData(res.data); // Update with ID from backend
+      alert('Resume saved successfully!');
+    } catch (error) {
+      console.error('Error saving resume:', error);
+      alert('Failed to save resume.');
+    }
+  };
 
   useEffect(() => {
     if (isClient) {
@@ -118,11 +172,12 @@ export default function ResumeBuilder() {
     const element = resumeRef.current;
     if (!element) return;
     const opt = {
-      margin: 0,
+      margin: [10, 10, 10, 10] as [number, number, number, number],
       filename: `${data.fullName.replace(/\s+/g, '_')}_Resume.pdf`,
-      image: { type: 'jpeg', quality: 0.98 },
+      image: { type: 'jpeg' as const, quality: 0.98 },
       html2canvas: { scale: 2, useCORS: true },
-      jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+      jsPDF: { unit: 'mm' as const, format: 'a4' as const, orientation: 'portrait' as const },
+      pagebreak: { mode: 'avoid-all' }
     };
 
     // Dynamically import html2pdf.js to avoid "self is not defined" error during SSR
@@ -246,7 +301,11 @@ export default function ResumeBuilder() {
       {/* Preview Area */}
       <div style={styles.preview}>
         <div style={styles.toolbar}>
-          <button onClick={downloadPDF} style={styles.downloadBtn}>Download PDF</button>
+          <div style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
+            {username ? <span style={styles.userBadge}>👤 {username}</span> : <button onClick={() => router.push('/auth')} style={styles.loginBtn}>Login/Register</button>}
+            <button onClick={saveToBackend} style={styles.saveBtn}>Save to Cloud</button>
+            <button onClick={downloadPDF} style={styles.downloadBtn}>Download PDF</button>
+          </div>
         </div>
 
         <div ref={resumeRef} id="resume-preview" style={resumeStyles.container}>
@@ -355,8 +414,11 @@ const styles: Record<string, React.CSSProperties> = {
   addBtn: { backgroundColor: '#4caf50', color: 'white', padding: '8px 12px', border: 'none', borderRadius: '4px', cursor: 'pointer', marginTop: '10px' },
   deleteBtn: { backgroundColor: '#ff4d4f', color: 'white', padding: '4px 8px', border: 'none', borderRadius: '4px', cursor: 'pointer', fontSize: '12px', marginTop: '5px' },
   hr: { margin: '30px 0', border: 'none', borderTop: '1px solid #ddd' },
-  toolbar: { marginBottom: '20px', display: 'flex', gap: '10px' },
+  toolbar: { marginBottom: '20px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', width: '100%' },
   downloadBtn: { backgroundColor: '#2563eb', color: 'white', padding: '10px 20px', border: 'none', borderRadius: '4px', cursor: 'pointer', fontWeight: 'bold' },
+  saveBtn: { backgroundColor: '#059669', color: 'white', padding: '10px 20px', border: 'none', borderRadius: '4px', cursor: 'pointer', fontWeight: 'bold' },
+  loginBtn: { backgroundColor: '#4b5563', color: 'white', padding: '8px 16px', border: 'none', borderRadius: '4px', cursor: 'pointer', fontSize: '14px' },
+  userBadge: { fontSize: '14px', fontWeight: 'bold', color: '#1f2937', marginRight: '10px' },
 };
 
 // Resume View Styles (Copied from previous step but scoped)
@@ -365,26 +427,26 @@ const resumeStyles: Record<string, React.CSSProperties> = {
     width: '210mm',
     minHeight: '297mm', // Visual min height for preview
     backgroundColor: 'white',
-    padding: '20px 40px',
+    padding: '15px 35px',
     boxShadow: '0 4px 6px rgba(0,0,0,0.1)',
     boxSizing: 'border-box',
     color: '#1f2937',
     fontFamily: '"Inter", sans-serif',
-    lineHeight: 1.5,
+    lineHeight: 1.4,
   },
-  header: { textAlign: 'center', borderBottom: '2px solid #e5e7eb', paddingBottom: '16px', marginBottom: '12px' },
+  header: { textAlign: 'center', borderBottom: '2px solid #e5e7eb', paddingBottom: '10px', marginBottom: '8px' },
   h1: { color: '#1f2937', fontSize: '26px', fontWeight: 700, margin: '0 0 6px 0', letterSpacing: '-0.5px', textTransform: 'uppercase' },
   contactInfo: { display: 'flex', justifyContent: 'center', flexWrap: 'wrap', gap: '10px', color: '#6b7280', fontSize: '13px' },
   contactItem: { display: 'flex', alignItems: 'center' },
   separator: { color: '#d1d5db', marginLeft: '5px', marginRight: '5px' },
-  section: { marginBottom: '12px' },
+  section: { marginBottom: '8px' },
   h2: { fontSize: '15px', fontWeight: 700, textTransform: 'uppercase', color: '#2563eb', margin: '0 0 10px 0', borderBottom: '1px solid #e5e7eb', paddingBottom: '4px', letterSpacing: '0.5px' },
   summaryText: { fontSize: '13px', color: '#1f2937', textAlign: 'justify' },
   skillsGrid: { display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(120px, 1fr))', gap: '8px' },
   skillTag: { backgroundColor: '#eff6ff', color: '#2563eb', padding: '4px 10px', borderRadius: '4px', fontSize: '12px', fontWeight: 500, textAlign: 'center', border: '1px solid #dbeafe' },
-  experienceItem: { marginBottom: '12px' },
-  projectItem: { marginBottom: '12px' },
-  educationItem: { marginBottom: '12px' },
+  experienceItem: { marginBottom: '8px' },
+  projectItem: { marginBottom: '8px' },
+  educationItem: { marginBottom: '8px' },
   itemHeader: { display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: '2px' },
   itemTitle: { fontWeight: 600, fontSize: '14px', color: '#1f2937' },
   itemSubtitle: { fontWeight: 500, fontSize: '13px', color: '#1f2937' },

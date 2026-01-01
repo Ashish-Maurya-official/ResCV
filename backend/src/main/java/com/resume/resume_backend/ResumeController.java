@@ -24,4 +24,10 @@ public class ResumeController {
         Optional<Resume> resume = resumeRepository.findById(id);
         return resume.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
     }
+
+    @GetMapping("/user/{userId}")
+    public ResponseEntity<Resume> getResumeByUserId(@PathVariable Long userId) {
+        Optional<Resume> resume = resumeRepository.findByUserId(userId);
+        return resume.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
+    }
 }

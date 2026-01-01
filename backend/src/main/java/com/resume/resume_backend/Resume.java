@@ -6,6 +6,7 @@ import java.util.List;
 @Data
 public class Resume {
     private Long id;
+    private Long userId;
     private String fullName;
     private String address;
     private String phone;
