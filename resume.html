@@ -1,0 +1,389 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Ashish Maurya - Resume</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --primary-color: #2563eb;
+      --text-dark: #1f2937;
+      --text-light: #6b7280;
+      --bg-color: #ffffff;
+      --section-spacing: 12px;
+    }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background-color: #f3f4f6;
+      color: var(--text-dark);
+      line-height: 1.5;
+      margin: 0;
+      padding: 20px;
+    }
+
+    .resume-container {
+      width: 210mm;
+      min-height: auto;
+      margin: 0 auto;
+      background: var(--bg-color);
+      padding: 20px 40px;
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+      border-radius: 8px;
+      box-sizing: border-box;
+    }
+
+    header {
+      text-align: center;
+      border-bottom: 2px solid #e5e7eb;
+      padding-bottom: 16px;
+      margin-bottom: var(--section-spacing);
+    }
+
+    h1 {
+      color: var(--text-dark);
+      font-size: 26px;
+      font-weight: 700;
+      margin: 0 0 6px 0;
+      letter-spacing: -0.5px;
+      text-transform: uppercase;
+    }
+
+    .contact-info {
+      display: flex;
+      justify-content: center;
+      flex-wrap: wrap;
+      gap: 10px;
+      color: var(--text-light);
+      font-size: 13px;
+    }
+
+    .contact-info span {
+      display: flex;
+      align-items: center;
+    }
+
+    .contact-info span:not(:last-child)::after {
+      content: "|";
+      margin-left: 10px;
+      color: #d1d5db;
+    }
+
+    section {
+      margin-bottom: var(--section-spacing);
+    }
+
+    h2 {
+      font-size: 15px;
+      font-weight: 700;
+      text-transform: uppercase;
+      color: var(--primary-color);
+      margin: 0 0 10px 0;
+      border-bottom: 1px solid #e5e7eb;
+      padding-bottom: 4px;
+      letter-spacing: 0.5px;
+    }
+
+    .summary-text {
+      font-size: 13px;
+      color: var(--text-dark);
+      text-align: justify;
+    }
+
+    .experience-item,
+    .project-item,
+    .education-item {
+      margin-bottom: 12px;
+    }
+
+    .item-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      margin-bottom: 2px;
+    }
+
+    .item-title {
+      font-weight: 600;
+      font-size: 14px;
+      color: var(--text-dark);
+    }
+
+    .item-subtitle {
+      font-weight: 500;
+      font-size: 13px;
+      color: var(--text-dark);
+    }
+
+    .item-date {
+      font-size: 12px;
+      color: var(--text-light);
+      font-weight: 500;
+    }
+
+    .item-location {
+      font-size: 12px;
+      color: var(--text-light);
+      font-style: italic;
+    }
+
+    ul {
+      margin: 4px 0 0 18px;
+      padding: 0;
+      list-style-type: disc;
+    }
+
+    li {
+      font-size: 13px;
+      color: #374151;
+      margin-bottom: 2px;
+    }
+
+    .skills-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+      gap: 8px;
+    }
+
+    .skill-tag {
+      background-color: #eff6ff;
+      color: var(--primary-color);
+      padding: 4px 10px;
+      border-radius: 4px;
+      font-size: 12px;
+      font-weight: 500;
+      text-align: center;
+      border: 1px solid #dbeafe;
+    }
+
+    @media screen and (max-width: 600px) {
+      .resume-container {
+        padding: 24px;
+      }
+
+      .item-header {
+        flex-direction: column;
+      }
+
+      .contact-info {
+        flex-direction: column;
+        align-items: center;
+      }
+
+      .contact-info span:not(:last-child)::after {
+        display: none;
+      }
+    }
+
+    .download-btn-container {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+
+    .download-btn {
+      background-color: var(--primary-color);
+      color: white;
+      border: none;
+      padding: 12px 24px;
+      font-size: 16px;
+      font-weight: 600;
+      border-radius: 8px;
+      cursor: pointer;
+      box-shadow: 0 4px 6px -1px rgba(37, 99, 235, 0.2), 0 2px 4px -1px rgba(37, 99, 235, 0.1);
+      transition: all 0.2s ease;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .download-btn:hover {
+      background-color: #1d4ed8;
+      transform: translateY(-1px);
+      box-shadow: 0 6px 8px -1px rgba(37, 99, 235, 0.3);
+    }
+
+    .download-btn:active {
+      transform: translateY(0);
+    }
+
+    @media print {
+      @page {
+        size: A4;
+        margin: 0;
+      }
+
+      .download-btn-container {
+        display: none;
+      }
+
+      body {
+        padding: 0;
+        background-color: white;
+      }
+
+      .resume-container {
+        width: 210mm;
+        height: auto;
+        box-shadow: none;
+        padding: 20px 40px;
+        margin: 0;
+        border-radius: 0;
+      }
+    }
+  </style>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+</head>
+
+<body>
+
+  <div class="download-btn-container">
+    <button onclick="downloadPDF()" class="download-btn">
+      <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
+        stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+        <polyline points="7 10 12 15 17 10"></polyline>
+        <line x1="12" y1="15" x2="12" y2="3"></line>
+      </svg>
+      Download PDF
+    </button>
+  </div>
+
+  <div class="resume-container" id="resume">
+    <header>
+      <h1>Ashish Maurya</h1>
+      <div class="contact-info">
+        <span>Chandauli 232110</span>
+        <span>+91 8887798423</span>
+        <span>Ashish53245@gmail.com</span>
+      </div>
+    </header>
+
+    <section>
+      <h2>Summary</h2>
+      <p class="summary-text">
+        Software Developer with hands-on experience in React Native, Flutter, Next.js, and Java. Strong logical thinking
+        ability with experience building real-world web and mobile applications. Seeking opportunities to grow as a
+        full-stack and cross-platform developer while contributing to production-level systems.
+      </p>
+    </section>
+
+    <section>
+      <h2>Technical Skills</h2>
+      <div class="skills-grid">
+        <div class="skill-tag">React Native</div>
+        <div class="skill-tag">Next.js</div>
+        <div class="skill-tag">Flutter</div>
+        <div class="skill-tag">Java</div>
+        <div class="skill-tag">Spring Boot</div>
+        <div class="skill-tag">REST APIs</div>
+        <div class="skill-tag">C/C++</div>
+        <div class="skill-tag">HTML/CSS/JS</div>
+        <div class="skill-tag">SQL</div>
+        <div class="skill-tag">Git & GitHub</div>
+        <div class="skill-tag">CI/CD</div>
+        <div class="skill-tag">Docker</div>
+        <div class="skill-tag">AWS</div>
+        <div class="skill-tag">Android/iOS</div>
+        <div class="skill-tag">Linux</div>
+      </div>
+    </section>
+
+    <section>
+      <h2>Experience</h2>
+
+      <div class="experience-item">
+        <div class="item-header">
+          <span class="item-title">Software Developer</span>
+          <span class="item-date">11/2025 – Current</span>
+        </div>
+        <div class="item-subtitle">YmGrad</div>
+        <ul>
+          <li>Developing and maintaining YmGrad website and mobile applications using React Native and Next.js.</li>
+          <li>Contributing to production apps available on Play Store and App Store.</li>
+          <li>Collaborating with team members in an agile environment.</li>
+          <li>Applying strong logical thinking and problem-solving skills to build production-level systems.</li>
+        </ul>
+      </div>
+
+      <div class="experience-item">
+        <div class="item-header">
+          <span class="item-title">Software Engineer Intern</span>
+          <span class="item-date">07/2025 – 11/2025</span>
+        </div>
+        <div class="item-subtitle">YmGrad</div>
+        <ul>
+          <li>Worked on React Native and Next.js projects, contributed to the YmGrad website and mobile applications.
+          </li>
+          <li>Applied strong logical thinking and problem-solving skills, and collaborated with the development team on
+            production applications.</li>
+        </ul>
+      </div>
+    </section>
+
+    <section>
+      <h2>Projects</h2>
+      <div class="project-item">
+        <div class="item-title">Wadorwas</div>
+        <ul>
+          <li>Full-stack Next.js web application with Spring Boot backend and AWS EC2 deployment.</li>
+        </ul>
+      </div>
+      <div class="project-item">
+        <div class="item-title">Recovator</div>
+        <ul>
+          <li>Windows desktop file recovery software built with Flutter and C++ integration.</li>
+        </ul>
+      </div>
+      <div class="project-item">
+        <div class="item-title">Movie Search Application</div>
+        <ul>
+          <li>Flutter mobile app using movie API with optimized search UI.</li>
+        </ul>
+      </div>
+    </section>
+
+    <section>
+      <h2>Education</h2>
+      <div class="education-item">
+        <div class="item-header">
+          <span class="item-title">Bachelor of Computer Applications</span>
+          <span class="item-date">Expected 08/2025</span>
+        </div>
+        <div class="item-subtitle">Computer Science</div>
+        <div class="item-location">Microtek College of Management & Technology, Varanasi, India</div>
+      </div>
+    </section>
+
+    <section>
+      <h2>Soft Skills</h2>
+      <div class="skills-grid">
+        <div class="skill-tag">Logical Thinking</div>
+        <div class="skill-tag">Team Collaboration</div>
+        <div class="skill-tag">Problem Solving</div>
+        <div class="skill-tag">Communication</div>
+      </div>
+    </section>
+
+  </div>
+
+  <script>
+    function downloadPDF() {
+      const element = document.getElementById('resume');
+      const opt = {
+        margin: 0,
+        filename: 'Ashish_Maurya_Resume.pdf',
+        image: { type: 'jpeg', quality: 0.98 },
+        html2canvas: { scale: 2, useCORS: true },
+        jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+      };
+
+      html2pdf().set(opt).from(element).save();
+    }
+  </script>
+</body>
+
+</html>
