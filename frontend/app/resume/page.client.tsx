@@ -4,6 +4,8 @@ import { useState, useEffect, useRef, ChangeEvent } from 'react';
 import axios from 'axios';
 import { useRouter } from 'next/navigation';
 
+const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8081';
+
 
 interface Experience {
   id: number;
@@ -112,11 +114,17 @@ export default function ResumeBuilder() {
 
     if (storedUserId) {
       // Fetch from backend
-      axios.get(`http://localhost:8080/api/resume/user/${storedUserId}`)
+      axios.get(`${API_URL}/api/resume/user/${storedUserId}`)
         .then(res => {
           if (res.data) {
             console.log("Fetched resume:", res.data);
-            setData(res.data);
+            // Convert skills array to comma-separated string for frontend
+            const fetchedData = {
+              ...res.data,
+              skills: Array.isArray(res.data.skills) ? res.data.skills.join(', ') : (res.data.skills || ''),
+              softSkills: initialData.softSkills // Backend doesn't store softSkills, use default
+            };
+            setData(fetchedData);
           }
         })
         .catch(err => {
@@ -152,9 +160,28 @@ export default function ResumeBuilder() {
     }
 
     try {
-      const payload = { ...data, userId: parseInt(userId) };
-      const res = await axios.post('http://localhost:8080/api/resume', payload);
-      setData(res.data); // Update with ID from backend
+      // Convert skills from comma-separated string to array for backend
+      const payload = {
+        id: data.id,
+        userId: parseInt(userId),
+        fullName: data.fullName,
+        address: data.address,
+        phone: data.phone,
+        email: data.email,
+        summary: data.summary,
+        skills: data.skills.split(',').map(s => s.trim()).filter(s => s),
+        experience: data.experience,
+        projects: data.projects,
+        education: data.education
+      };
+      const res = await axios.post(`${API_URL}/api/resume`, payload);
+      // Convert skills array back to string for frontend state
+      const savedData = {
+        ...res.data,
+        skills: Array.isArray(res.data.skills) ? res.data.skills.join(', ') : res.data.skills,
+        softSkills: data.softSkills // Keep softSkills locally
+      };
+      setData(savedData);
       alert('Resume saved successfully!');
     } catch (error) {
       console.error('Error saving resume:', error);

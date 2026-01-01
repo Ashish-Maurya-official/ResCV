@@ -4,6 +4,8 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import axios from 'axios';
 
+const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8081';
+
 export default function AuthPage() {
     const [isLogin, setIsLogin] = useState(true);
     const [formData, setFormData] = useState({ username: '', password: '', email: '' });
@@ -23,7 +25,7 @@ export default function AuthPage() {
         }
 
         try {
-            const endpoint = isLogin ? 'http://localhost:8080/api/auth/login' : 'http://localhost:8080/api/auth/register';
+            const endpoint = isLogin ? `${API_URL}/api/auth/login` : `${API_URL}/api/auth/register`;
 
             const payload = isLogin
                 ? { username: formData.username, password: formData.password }
@@ -32,7 +34,7 @@ export default function AuthPage() {
             const res = await axios.post(endpoint, payload);
 
             if (isLogin) {
-                localStorage.setItem('token', 'dummy-jwt-token'); // In real app, use token from res
+                localStorage.setItem('token', 'dummy-jwt-token');
                 localStorage.setItem('userId', res.data.userId);
                 localStorage.setItem('username', res.data.username);
                 router.push('/resume');
